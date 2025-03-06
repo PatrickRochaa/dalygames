@@ -1,101 +1,92 @@
-import Image from "next/image";
+import Image from "next/image"; // Importa o componente de imagem do Next.js
+import { Container } from "@/components/container"; // Importa o Container, que provavelmente envolve o conteúdo da página
+import { GameCard } from "@/components/gameCard"; // Importa o componente de exibição de jogos
+import { Input } from "@/components/input"; // Importa o componente de Input para a pesquisa
+import { GameProps } from "@/utils/types/game"; // Importa o tipo de dados de jogo
+import Link from "next/link"; // Importa o componente Link do Next.js para navegação
+import { BsArrowRightSquare } from "react-icons/bs"; // Importa o ícone de seta da biblioteca react-icons
 
-export default function Home() {
+// Função assíncrona para pegar o jogo do dia
+async function getDalyGame() {
+  try {
+    // Faz a requisição para obter o jogo do dia, com revalidação após 320 segundos
+    const res = await fetch(
+      `${process.env.NEXT_API_URL}/next-api/?api=game_day`,
+      { next: { revalidate: 320 } }
+    );
+    return res.json(); // Retorna os dados em formato JSON
+  } catch (err) {
+    // Caso haja erro, lança um erro
+    throw new Error("Failed to fetch data");
+  }
+}
+
+// Função assíncrona para pegar os dados dos jogos
+async function getGamesData() {
+  try {
+    // Faz a requisição para obter todos os jogos, com revalidação após 320 segundos
+    const res = await fetch(`${process.env.NEXT_API_URL}/next-api/?api=games`, {
+      next: { revalidate: 320 },
+    });
+    return res.json(); // Retorna os dados em formato JSON
+  } catch (err) {
+    // Caso haja erro, lança um erro
+    throw new Error("Failed to fetch data");
+  }
+}
+
+// Função principal da página (Home)
+export default async function Home() {
+  // Chama as funções assíncronas para obter o jogo do dia e a lista de jogos
+  const dalyGame: GameProps = await getDalyGame(); // Obtém o jogo do dia
+  const data: GameProps[] = await getGamesData(); // Obtém a lista de jogos
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <main className="w-full">
+      {/* Contêiner principal da página */}
+      <Container>
+        {/* Título da seção do jogo exclusivo */}
+        <h1 className="text-center font-bold text-xl mt-8 mb-5">
+          Separamos um jogo exclusivo pra você
+        </h1>
+        {/* Link para a página do jogo do dia */}
+        <Link href={`/game/${dalyGame.id}`}>
+          {/* Seção de sugestão de jogo */}
+          <section className="w-full bg-black rounded-lg">
+            <div className="w-full max-h-96 h-96 relative rounded-lg">
+              {/* Nome do jogo exibido na parte inferior da imagem */}
+              <div className="absolute z-20 bottom-0 p-3 flex justify-center items-center gap-2">
+                <p className="font-bold text-xl text-white">{dalyGame.title}</p>
+                {/* Ícone de seta apontando para a direita */}
+                <BsArrowRightSquare size={24} color="#fff" />
+              </div>
+              {/* Imagem do jogo */}
+              <Image
+                src={dalyGame.image_url} // URL da imagem do jogo
+                alt={dalyGame.title} // Texto alternativo da imagem (o título do jogo)
+                priority={true} // Define a prioridade de carregamento da imagem
+                quality={100} // Define a qualidade da imagem (máxima)
+                fill={true} // Faz a imagem preencher o container
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw" // Tamanhos diferentes para responsividade
+                className="max-h-96 object-cover rounded-lg opacity-50 hover:opacity-80 transition-all duration-300" // Estilo da imagem
+              />
+            </div>
+          </section>
+        </Link>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        {/* Input de pesquisa para procurar jogos */}
+        <Input />
+
+        {/* Título da seção de jogos sugeridos */}
+        <h2 className="text-lg font-bold mt-8 mb-5">Jogos para conhecer</h2>
+        {/* Grid exibindo os jogos */}
+        <section className="grid gap-7 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {data.map((item) => (
+            // Exibe um card para cada jogo
+            <GameCard key={item.id} data={item} />
+          ))}
+        </section>
+      </Container>
+    </main>
   );
 }
