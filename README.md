@@ -18,8 +18,3 @@ Este é um projeto desenvolvido no **Curso FullStack Pro do módulo NextJS** do 
 • Ícones para melhorar a experiência do usuário, fornecidos pela biblioteca React Icons.  
 • Seção de favoritos, onde o usuário pode adicionar até três jogos favoritos.
 
-
-
-**Autor:**
-
-- **Patrick Rocha** - Desenvolvedor Front-End, aluno do curso FullStack Pro.
